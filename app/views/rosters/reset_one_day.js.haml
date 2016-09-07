@@ -1,0 +1,7 @@
+
+$("#roster_one_days_attributes_#{@num}_working_hours").val("#{@one_day.working_hours}");
+$("#roster_one_days_attributes_#{@num}_late_early").val("#{@one_day.late_early}");
+
+calcTotalWorking();
+calcTotalLateEarly();
+calcSummary();

@@ -1,0 +1,7 @@
+%h1 Editing company
+
+= render 'form'
+
+= link_to 'Show', company_users_path(@current_company, @user)
+\|
+= link_to 'Back', company_users_path(@current_company)

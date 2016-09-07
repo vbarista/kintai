@@ -1,0 +1,21 @@
+%h1 Listing companies
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th
+      %th
+      %th
+
+  %tbody
+    - @users.each do |user|
+      %tr
+        %td= user.name
+        %td= link_to 'Show', company_user_path(@current_company, user)
+        %td= link_to 'Edit', edit_company_user_path(@current_company, user)
+        %td= link_to 'Destroy', company_user_path(@current_company, user), method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New User', new_company_user_path

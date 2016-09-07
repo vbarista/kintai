@@ -1,0 +1,334 @@
+:css
+  th.week, th.day{width: 30px;}
+  th.situation, .situation select { width:60px; }
+  th.company, .company select { width:120px; }
+  th.form, .form input { width:70px; }
+  #week, #day { vertical-align: middle }
+  td.note input { width: 100%; }
+  td.seal { height: 50px; }
+
+:javascript
+  var base_hour = #{ Roster::BASE_WORK_HOUR }; // 基本時間
+  var allowance_hour = 16; // 業務手当時間
+  var total_target_liquidation = 0; // 清算対象合計
+  var total_all_paid_holiday = 0; // 有給休暇合計
+
+  $(function(){
+    $("form").keypress(function(e) {
+      if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    $(".ajax").on("change", function(){
+      var $self = $(this);
+      var $tr = $self.parents("tr");
+      var $working_hours = $tr.find(".working_hours");
+      var $late_early = $tr.find(".late_early");
+      var $house = $tr.find(".house");
+      var send_flug = true;
+
+      // 非勤務の場合に入力項目を消す
+      var non_work_values = #{ OneDay::NON_WORK_SITUASION_VALUE_LIST.to_json };
+      if ($self.is("[name*='situation']") && $.inArray($self.val(), non_work_values) != -1) {
+        $tr.find(".ajax:text, select.company, .working_hours:text").val("");
+        calcSummary();
+        return false;
+      }
+
+      $tr.find(".ajax").each(function(){
+        if($.trim($(this).val()) == ""){
+          $working_hours.val("");
+          $late_early.val("");
+          $house.val("");
+          send_flug = false;
+          return;
+        }
+      });
+
+      if (send_flug) {
+        $.ajax({
+          type: "GET",
+          url: "#{ reset_one_day_company_rosters_path(@current_company, format: 'js') }",
+          data: $tr.find("[name*='one_days_attributes']").serialize(),
+        }).fail(function(){
+          $working_hours.val("");
+        }).complete(function(){
+          calcSummary();
+        });
+      } else {
+        calcSummary();
+      }
+    }); // end of .on("change")
+
+    $("input.house").on("change", calcTotalHouse);
+    calcSummary();
+  });
+
+  function ZeroIsHyphen(num){
+    if (num == 0) return "-";
+    return num;
+  }
+
+  function calcTotalWorking(){
+    var total = 0;
+    $("input.working_hours").each(function(){
+      if ($.trim($(this).val()) == '') return true;
+      total += parseFloat($(this).val());
+    });
+    $(".total_hour_working").text(ZeroIsHyphen(total));
+    $("#roster_total_hour_working").val(total);
+    total_target_liquidation = total;
+  }
+
+  function calcTotalLateEarly(){
+    var total = 0;
+    $("input.late_early").each(function(){
+      if ($.trim($(this).val()) == '') return true;
+      total += parseFloat($(this).val());
+    });
+    $("#roster_total_hour_late_early").val(total);
+    $(".total_hour_late_early").text(ZeroIsHyphen(total));
+    total_all_paid_holiday = total;
+  }
+
+  function calcTotalHouse(){
+    var total = 0;
+    $("input.house").each(function(){
+      if ($.trim($(this).val()) == '') return true;
+      total += parseFloat($(this).val());
+    });
+    $("#roster_total_hour_house").val(total);
+    $(".total_hour_house").text(ZeroIsHyphen(total));
+  }
+
+  function calcSummary(){
+    calcTotalWorking();
+    calcTotalLateEarly();
+    calcTotalHouse();
+    // 要出勤日数
+    var required_work_day = $("tr.normal").size();
+    $("#roster_required_work_day").val(required_work_day);
+    $("#required_work_day").text(required_work_day);
+    // 要出勤時間
+    var required_work_hour = required_work_day * base_hour;
+    $("#roster_required_work_hour").val(required_work_hour);
+    $("#required_work_hour").text(required_work_hour);
+    // 業務手当時間
+    $("#roster_allowance_hour").val(allowance_hour);
+    $("#allowance_hour").text(allowance_hour);
+    // 清算基本時間
+    var total_base_liquidation_hour = required_work_hour + allowance_hour;
+    $("#total_base_liquidation_hour").text(total_base_liquidation_hour);
+    // 出勤日数
+    var total_work_day = 0;
+    var non_work_values = #{ OneDay::NON_WORK_SITUASION_VALUE_LIST.to_json };
+    $("select[name*=situation]").each(function(i, elm){
+      if ($.inArray($(elm).val(), non_work_values) == -1){
+        total_work_day += 1;
+      }
+    });
+    $("#roster_total_work_day").val(total_work_day);
+    $("#total_work_day").text(total_work_day);
+
+    getSituationCount("holiday_work");  // 休出
+    getSituationCount("house_work");    // 社内
+    getSituationCount("paid_holiday");  // 有給
+    getSituationCount("drill");         // 教練
+    getSituationCount("special");       // 特別
+    getSituationCount("home");          // 自待
+    getSituationCount("bereavement");   // 忌引
+    getSituationCount("absence");       // 欠勤
+    getSituationCount("transfer")       // 振替
+    getSituationCount("business_trip"); // 出張
+    getSituationCount("holiday_work");  // 休出
+
+    // 清算時間の計算
+    var paid_hour = total_target_liquidation + total_all_paid_holiday; // 清算対象合計 + 有給休暇合計
+    if ( paid_hour > total_base_liquidation_hour) {
+      var liquidation = paid_hour - total_base_liquidation_hour;
+      $("#liquidation").text(liquidation);
+    } else {
+      $("#liquidation").text("-");
+    }
+
+    // 調整時間の計算
+    if (paid_hour < required_work_hour) {
+      var adjustment_hour = paid_hour - required_work_hour;
+      $("#adjustment_hour").text(adjustment_hour);
+    } else {
+      $("#adjustment_hour").text("-");
+    }
+
+  } // calcSummary()
+
+  function getSituationCount(id){
+    var total = 0;
+    $("select[name*=situation]").each(function(i, elm){
+      if ($(elm).val() == id) total += 1;
+    });
+    $("#roster_" + id).val(total);
+    // トータルカウント
+    $("#" + id).text(ZeroIsHyphen(total));
+
+    // 5:忌引, 6:特別, 10:自待, 11:教練
+    if ($.inArray(id, #{ OneDay::LIQUIDATION_VALUE_LIST.to_json }) != -1){
+      total_hour = base_hour * total;
+      $("#total_hour_" + id).text(ZeroIsHyphen(total_hour));
+      total_target_liquidation += total_hour;
+      $("#total_target_liquidation").text(total_target_liquidation);
+    // 有給
+    } else if (id == #{ OneDay::PAID_HOLIDAY_VALUE.to_json }) {
+      total_hour = base_hour * total;
+      $("#total_hour_" + id).text(ZeroIsHyphen(total_hour));
+      total_all_paid_holiday += total_hour;
+      $("#total_all_paid_holiday").text(ZeroIsHyphen(total_all_paid_holiday));
+    }
+  }
+
+.table-responsive
+  = nested_form_for [@current_company.to_company, @roster], html: { method: 'PUT', class: 'form-horizontal' } do |f|
+    %strong= "勤務表【#{ @roster.user.name }】#{ @roster.year + "年" + @roster.month + "月" }"
+    %table.table.table-bordered.table-hover
+      %thead
+        %tr
+          %th.week= '曜'
+          %th.day= '日'
+          %th.situation= '勤務状況'
+          %th.company= '勤務形態'
+          %th.form= '出勤時刻'
+          %th.form= '時刻'
+          %th.form= '実働'
+          %th.form= '遅早'
+          %th.form= '社内'
+          %th.note= '備考'
+
+      %tbody
+        - wd = %w(月 火 水 木 金 土 日)
+
+        = f.fields_for :one_days do |od|
+          - tr_css = od.object.work_day? ? 'normal' : 'warning'
+          %tr{class: tr_css}
+            %td#week
+              = od.hidden_field :id, class: 'id'
+              = wd[od.object.day.wday-1]
+            %td#day= od.object.day.day
+            %td.situation= od.select :situation, situation_select_options(od.object), {}, { class: 'form-control ajax' }
+            %td.company= od.select :company_id, Company.all.map {|c| [c.name, c.id]}, { include_blank: true }, { class: 'form-control ajax company' }
+            %td.form= od.text_field :from, pattern: '([0-9]|[1-2][0-9])(:[0-5][0-9])', maxlength:5, class: 'form-control ajax'
+            %td.form= od.text_field :to, maxlength: 5, pattern: '([0-9]|[1-2][0-9])(:[0-5][0-9])', class: 'form-control ajax'
+            %td.form= od.text_field :working_hours, maxlength: 5, class: 'form-control working_hours', readonly: true
+            %td.form= od.text_field :late_early, maxlength: 5, pattern: '([0-9])(¥.[0-9][0-9])', class: 'form-control late_early', readonly: true
+            %td.form= od.text_field :house, maxlength: 5, pattern: '([0-9])(¥.[0-9][0-9])', class: 'form-control house'
+            %td.note= od.text_field :note, maxlength: 255, class: 'form-control'
+        %tr
+          %td{ colspan: 6, style: 'text-align: right' }= '計'
+          %td.total_hour_working
+          %td.total_hour_late_early
+          %td.total_hour_house
+          %td
+
+    .col-xs-6
+      %table.table.table-bordered
+        %tr
+          %th.text-right= '要出勤'
+          %td#required_work_day.text-right
+          = f.hidden_field :required_work_day
+          %th.text-right= '出勤'
+          %td#total_work_day.text-right
+          = f.hidden_field :total_work_day
+        %tr
+          %th.warning.text-right= '要出勤時間'
+          %td#required_work_hour.text-right
+          = f.hidden_field :required_work_hour
+          %th.warning.text-right= '業務手当時間'
+          %td#allowance_hour.text-right
+          = f.hidden_field :allowance_hour
+        %tr
+          %th.text-right= '欠勤'
+          %td#absence.text-right
+          = f.hidden_field :absence
+          %th.text-right= '休出'
+          %td#holiday_work.text-right
+          = f.hidden_field :holiday_work
+        %tr
+          %th.text-right= '自待'
+          %td#home.text-right
+          = f.hidden_field :home
+          %th.text-right= '有給'
+          %td#paid_holiday.text-right
+          = f.hidden_field :paid_holiday
+        %tr
+          %th.text-right= '社内'
+          %td#house_work.text-right
+          = f.hidden_field :house_work
+          %th.text-right= '忌引'
+          %td#bereavement.text-right
+          = f.hidden_field :bereavement
+        %tr
+          %th.text-right= '振休'
+          %td#transfer.text-right
+          = f.hidden_field :transfer
+          %th.text-right= '出張'
+          %td#business_trip.text-right
+          = f.hidden_field :business_trip
+        %tr
+          %th.text-right= '教練'
+          %td#drill.text-right
+          = f.hidden_field :drill
+          %th.text-right= '特別'
+          %td#special.text-right
+          = f.hidden_field :special
+
+    .col-xs-6
+      %table.table.table-bordered
+        %tr
+          %th.info.text-right= '出勤時間'
+          %td.total_hour_working.text-right
+          = f.hidden_field :total_hour_working
+          %th.info.text-right= '忌引時間'
+          %td#total_hour_bereavement.text-right
+        %tr
+          %th.info.text-right= '自待時間'
+          %td#total_hour_home.text-right
+          %th.info.text-right= '特別時間'
+          %td#total_hour_special.text-right
+        %tr
+          %th.info.text-right= '社内時間'
+          %td.total_hour_house.text-right
+          = f.hidden_field :total_hour_house
+          %th.info.text-right= '教練時間'
+          %td#total_hour_drill.text-right
+        %tr
+          %th.info.text-right= '清算対象時間'
+          %td#total_target_liquidation.text-right{ colspan: 3 }
+        %tr
+          %th.warning.text-right= '清算基本時間'
+          %td#total_base_liquidation_hour.text-right{ colspan: 3 }
+        %tr
+          %th.success.text-right= '遅早時間'
+          %td.total_hour_late_early.text-right
+          = f.hidden_field :total_hour_late_early
+          %th.success.text-right= '有給時間'
+          %td#total_hour_paid_holiday.text-right
+        %tr
+          %th.success.text-right= '有給＋遅早時間'
+          %td#total_all_paid_holiday.text-right{ colspan: 3 }
+
+
+    .col-md-8
+      %strong= OneDay.human_attribute_name(:memo) + ':'
+      = f.text_field :memo
+      = f.button '保存', class: 'btn btn-default'
+      = link_to t('.cancel', default: t("helpers.links.cancel")), company_rosters_path(@current_company), class: 'btn btn-default'
+
+    .col-md-4
+      %table.table.table-bordered
+        %tr
+          %th.info.text-right= '清算時間'
+          %td#liquidation.text-right
+        %tr
+          %th.info.text-right= '調整時間'
+          %td#adjustment_hour.text-right

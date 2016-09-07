@@ -1,0 +1,13 @@
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th= '年月'
+      %th= 'メモ'
+      %th= '最終更新'
+  %tbody
+    - @rosters.each do |roster|
+      %tr
+        %td= link_to roster.year + roster.month, edit_company_roster_path(@current_company, roster), class: 'btn btn-primary'
+        %td= roster.memo
+        %td=l roster.updated_at

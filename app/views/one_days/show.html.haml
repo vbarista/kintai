@@ -1,0 +1,29 @@
+- model_class = OneDay
+.page-header
+  %h1=t '.title', default: model_class.model_name.human.titleize
+
+%p
+  %strong= model_class.human_attribute_name(:roster_id) + ':'
+  %br
+  = @one_day.roster_id
+%p
+  %strong= model_class.human_attribute_name(:day) + ':'
+  %br
+  = @one_day.day
+%p
+  %strong= model_class.human_attribute_name(:from) + ':'
+  %br
+  = @one_day.from
+%p
+  %strong= model_class.human_attribute_name(:to) + ':'
+  %br
+  = @one_day.to
+%p
+  %strong= model_class.human_attribute_name(:total) + ':'
+  %br
+  = @one_day.total
+
+
+= link_to t('.back', default: t("helpers.links.back")), company_roster_one_days_path(@current_company, @roster), class: 'btn btn-default'
+= link_to t('.edit', default: t("helpers.links.edit")), edit_company_roster_one_day_path(@current_company, @roster, @one_day), class: 'btn btn-default'
+= link_to t('.destroy', default: t("helpers.links.destroy")), company_roster_one_day_path(@current_company, @roster, @one_day), method: "delete", data: { confirm: t('.confirm', default: t("helpers.links.confirm", default: 'Are you sure?')) }, class: 'btn btn-danger'

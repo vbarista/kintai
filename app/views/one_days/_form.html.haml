@@ -1,0 +1,13 @@
+= simple_form_for [@current_company, @roster, @one_day], html: { class: 'form-horizontal' } do |f|
+  = f.input :roster_id
+  = error_span(@one_day[:roster_id])
+  = f.input :day
+  = error_span(@one_day[:day])
+  = f.input :from
+  = error_span(@one_day[:from])
+  = f.input :to
+  = error_span(@one_day[:to])
+  = f.input :total
+  = error_span(@one_day[:total])
+  = f.button :submit, class: 'btn-primary'
+  = link_to t('.cancel', default: t("helpers.links.cancel")), company_roster_one_days_path(@current_company, @roster), class: 'btn btn-default'
