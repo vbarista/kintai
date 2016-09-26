@@ -1,143 +1,175 @@
 :css
   @media print {
     body { font-size: 8px; }
-    .table > thead > tr > th,
-    .table > thead > tr > td,
-    .table > tbody > tr > th,
-    .table > tbody > tr > td,
-    .table > tfoot > tr > th,
-    .table > tfoot > tr > td {
-      padding: 3px;
+    .table-bordered,
+    .table-bordered > thead > tr > th,
+    .table-bordered > thead > tr > td,
+    .table-bordered > tbody > tr > th,
+    .table-bordered > tbody > tr > td,
+    .table-bordered > tfoot > tr > th,
+    .table-bordered > tfoot > tr > td {
+        padding: 3px;
+        border: 1px solid #000 !important;
     }
+    #back-to-list { display: none; }
   }
+
+  .table-bordered,
+  .table-bordered > thead > tr > th,
+  .table-bordered > thead > tr > td,
+  .table-bordered > tbody > tr > th,
+  .table-bordered > tbody > tr > td,
+  .table-bordered > tfoot > tr > th,
+  .table-bordered > tfoot > tr > td {
+      border: 1px solid #000;
+  }
+
   th { white-space: nowrap; width:70px; }
-  th.week, th.day{width: 30px;}
+  th.week, th.day{width: 30px; }
   th.situation, .situation select { width:60px; }
   th.company, .company select { width:120px; }
-  th, th { padding: 2px; }
 
-  #week, #day { vertical-align: middle }
+  #week, #day { vertical-align: middle; }
   td.note { width: 100%; }
 
-.table-responsive.table-condensed
-  %strong= "勤務表【#{ @roster.user.name }】#{ @roster.year + "年" + @roster.month + "月" }"
+.table-responsive.table-condensed.col-xs-12
+  %h3.col-xs-8= "勤務表 【#{ @roster.user.name }】 #{ @roster.year + "年" + @roster.month + "月" }"
+  %h4.col-xs-4{ style: 'text-align: right' }= link_to "勤務表一覧へ戻る", company_user_rosters_path(@user.company, @user), method: :get, id: 'back-to-list'
   %table.table.table-bordered.table-hover
     %thead
       %tr
-        %th.week= '曜'
-        %th.day= '日'
-        %th.situation= '勤務状況'
-        %th.company= '勤務形態'
-        %th.form= '出勤時刻'
-        %th.form= '時刻'
-        %th.form= '実働'
-        %th.form= '遅早'
-        %th.form= '社内'
-        %th.note= '備考'
+        %th.text-center.week= '曜'
+        %th.text-center.day= '日'
+        %th.text-center.situation= '勤務状況'
+        %th.text-center.company= '勤務形態'
+        %th.text-center.form= '出勤時刻'
+        %th.text-center.form= '時刻'
+        %th.text-center.form= '実働'
+        %th.text-center.form= '遅早'
+        %th.text-center.form= '社内'
+        %th.text-center.note= '備考'
 
     %tbody
       - wd = %w(月 火 水 木 金 土 日)
 
       - @roster.one_days.each do |od|
-        - tr_css = od.work_day? ? 'normal' : 'warning'
+        - tr_css = td_class_for_background_color(od)
         %tr{class: tr_css}
-          %td#week
+          %td#week.text-center
             = wd[od.day.wday-1]
-          %td#day= od.day.day
-          %td.situation= OneDay::SITUASIONS[od.situation]
-          %td.company= od.company.try(:name)
-          %td.form= od.from
-          %td.form= od.to
-          %td.form= od.working_hours.to_f unless od.situation == "holyday"
-          %td.form= od.late_early.to_f unless od.situation == "holyday"
-          %td.form= od.house.to_f unless od.situation == "holyday"
-          %td.note= od.note
+          %td#day.texlt-right= od.day.day
+          %td.situation.text-center= OneDay::SITUASIONS[od.situation]
+          %td.company{ style: "white-space: nowrap;" }= od.company.try(:name)
+          %td.form.text-right= od.from
+          %td.form.text-right= od.to
+          %td.form.text-right= od.working_hours.to_f unless OneDay::NON_WORK_SITUASION_VALUE_LIST.index(od.situation.to_sym)
+          %td.form.text-right= od.late_early.to_f unless OneDay::NON_WORK_SITUASION_VALUE_LIST.index(od.situation.to_sym)
+          %td.form.text-right= od.house.to_f unless OneDay::NON_WORK_SITUASION_VALUE_LIST.index(od.situation.to_sym)
+          %td.note.text-left= "　#{od.note}"
       %tr
         %td{ colspan: 6, style: 'text-align: right' }= '計'
-        %td= @roster.total_hour_working.to_f
-        %td= @roster.total_hour_late_early.to_f
-        %td= @roster.total_hour_house.to_f
+        %td.text-right= @roster.total_hour_working.to_f
+        %td.text-right= @roster.total_hour_late_early.to_f
+        %td.text-right= @roster.total_hour_house.to_f
         %td
 
-  .col-xs-6
-    %table.table.table-bordered.table-condensed
-      %tr
-        %th.text-right= '要出勤'
-        %td.text-right= @roster.required_work_day
-        %th.text-right= '出勤'
-        %td.text-right= @roster.total_work_day
-      %tr
-        %th.warning.text-right= '要出勤時間'
-        %td#required_work_hour.text-right= @roster.required_work_day.to_f * Roster::BASE_WORK_HOUR
-        %th.warning.text-right= '業務手当時間'
-        %td.text-right= @roster.allowance_hour.to_f
-      %tr
-        %th.text-right= '欠勤'
-        %td.text-right= @roster.absence
-        %th.text-right= '休出'
-        %td.text-right= @roster.holiday_work
-      %tr
-        %th.text-right= '自待'
-        %td.text-right= @roster.home
-        %th.text-right= '有給'
-        %td.text-right= @roster.paid_holiday
-      %tr
-        %th.text-right= '社内'
-        %td.text-right= @roster.house_work
-        %th.text-right= '忌引'
-        %td.text-right= @roster.bereavement
-      %tr
-        %th.text-right= '振休'
-        %td.text-right= @roster.transfer
-        %th.text-right= '出張'
-        %td.text-right= @roster.business_trip
-      %tr
-        %th.text-right= '教練'
-        %td.text-right= @roster.drill
-        %th.text-right= '特別'
-        %td.text-right= @roster.special
+.col-xs-6.col-md-6
+  %table.table.table-bordered.table-condensed
+    %tr
+      %th.text-right= '要出勤'
+      %td.text-right= @roster.required_work_day
+      %th.text-right= '出勤'
+      %td.text-right= @roster.total_work_day
+    %tr
+      %th.warning.text-right= '要出勤時間'
+      %td#required_work_hour.text-right= required_work_hour(@roster)
+      %th.warning.text-right= '業務手当時間'
+      %td.text-right= @roster.allowance_hour.to_f
+    %tr
+      %th.text-right= '欠勤'
+      %td.text-right= @roster.absence
+      %th.text-right= '休出'
+      %td.text-right= @roster.holiday_work
+    %tr
+      %th.text-right= '自待'
+      %td.text-right= @roster.home
+      %th.text-right= '有給'
+      %td.text-right= @roster.paid_holiday
+    %tr
+      %th.text-right= '社内'
+      %td.text-right= @roster.house_work
+      %th.text-right= '忌引'
+      %td.text-right= @roster.bereavement
+    %tr
+      %th.text-right= '振休'
+      %td.text-right= @roster.transfer
+      %th.text-right= '出張'
+      %td.text-right= @roster.business_trip
+    %tr
+      %th.text-right= '教練'
+      %td.text-right= @roster.drill
+      %th.text-right= '特別'
+      %td.text-right= @roster.special
 
-  .col-xs-6
-    %table.table.table-bordered.table-condensed
-      %tr
-        %th.info.text-right= '出勤時間'
-        %td.text-right= @roster.total_hour_working.to_f
-        %th.info.text-right= '忌引時間'
-        %td.text-right= @roster.bereavement.to_f * Roster::BASE_WORK_HOUR
-      %tr
-        %th.info.text-right= '自待時間'
-        %td.text-right= @roster.home.to_f * Roster::BASE_WORK_HOUR
-        %th.info.text-right= '特別時間'
-        %td.text-right= @roster.special.to_f * Roster::BASE_WORK_HOUR
-      %tr
-        %th.info.text-right= '社内時間'
-        %td.text-right= @roster.total_hour_house.to_f
-        %th.info.text-right= '教練時間'
-        %td.text-right= @roster.drill.to_f * Roster::BASE_WORK_HOUR
-      %tr
-        %th.info.text-right= '清算対象時間'
-        %td.text-right{ colspan: 3 }= liquidation_hour(@roster)
-      %tr
-        %th.warning.text-right= '清算基本時間'
-        %td.text-right{ colspan: 3 }= @roster.allowance_hour.to_f + @roster.required_work_day.to_f * Roster::BASE_WORK_HOUR
-      %tr
-        %th.success.text-right= '遅早時間'
-        %td.text-right= @roster.total_hour_late_early.to_f
-        %th.success.text-right= '有給時間'
-        %td.text-right= @roster.paid_holiday.to_f * Roster::BASE_WORK_HOUR
-      %tr
-        %th.success.text-right= '有給＋遅早時間'
-        %td#total_all_paid_holiday.text-right{ colspan: 3 }= @roster.total_hour_late_early.to_f + @roster.paid_holiday.to_f * Roster::BASE_WORK_HOUR
+.col-xs-6.col-md-6
+  %table.table.table-bordered.table-condensed
+    %tr
+      %th.info.text-right= '出勤時間'
+      %td.text-right= @roster.total_hour_working.to_f
+      %th.info.text-right= '社内時間'
+      %td.text-right= @roster.total_hour_house.to_f
+    %tr
+      %th.info.text-right= '遅早時間'
+      %td.text-right= @roster.total_hour_late_early.to_f
+      %th.info.text-right= '教練時間'
+      %td.text-right= @roster.drill.to_f * Roster::BASE_WORK_HOUR
+    %tr
+      %th.info.text-right= '有給時間'
+      %td.text-right= @roster.paid_holiday.to_f * Roster::BASE_WORK_HOUR
+      %th.info.text-right= '自待時間'
+      %td.text-right= @roster.home.to_f * Roster::BASE_WORK_HOUR
+    %tr
+      %th.info.text-right= '特別時間'
+      %td.text-right= @roster.special.to_f * Roster::BASE_WORK_HOUR
+    %tr
+      %th.info.text-right= '忌引時間'
+      %td.text-right= @roster.bereavement.to_f * Roster::BASE_WORK_HOUR
+    %tr
+      %td.text-right{ colspan: 2 } &nbsp;
+    %tr
+      %th.success.text-right= '有給＋遅早時間'
+      %td#total_all_paid_holiday.text-right= @roster.total_hour_late_early.to_f + @roster.paid_holiday.to_f * Roster::BASE_WORK_HOUR
 
-  .col-md-8
-    %strong= OneDay.human_attribute_name(:memo) + ':'
+.col-xs-6.col-md-3
+  .status
+    編集状態：
+    = Roster::STATUSES[@roster.status]
+    ／有休残：
+    = rest_paid_leave(@roster)
 
-
-  .col-md-4
-    %table.table.table-bordered.table-condensed
-      %tr
-        %th.info.text-right= '清算時間'
-        %td#liquidation.text-right
-      %tr
-        %th.info.text-right= '調整時間'
-        %td#adjustment_hour.text-right
+.col-xs-12.col-md-9
+  %table.table.table-bordered.table-condensed{style: 'margin-bottom: 0px;'}
+    %tr
+      %th.info.text-center{ style: 'width: 100px;' }= '承　認'
+      %th.info.text-center{ style: 'width: 100px;' }= '調　査'
+      %th.info.text-center{ style: 'width: 100px;' }= '担　当'
+      %td{ style: 'border-top-style: hidden !important; border-bottom-style: hidden !important; width: 10px;' }
+      %th.info.text-right= '精算対象時間'
+      %td#total_target_liquidation.text-right= total_target_liquidation_hour(@roster)
+    %tr
+      %td{ rowspan: 4 }
+      %td{ rowspan: 4 }
+      %td{ rowspan: 4 }
+      %td{ style: 'border-top-style: hidden !important; border-bottom-style: hidden !important;' }
+      %th.info.text-right= '精算基本時間'
+      %td#total_base_liquidation_hour.text-right= @roster.allowance_hour.to_f + @roster.required_work_day.to_f * Roster::BASE_WORK_HOUR
+    %tr
+      %td{ colspan: 3, style: 'border-right-style: hidden !important;' }
+    %tr
+      %td{ style: 'border-top-style: hidden !important; border-bottom-style: hidden !important;' }
+      %th.info.text-right= '精算時間'
+      %td#liquidation.text-right= liquidation_hour(@roster)
+    %tr
+      %td{ style: 'border-top-style: hidden !important; border-bottom-style: hidden !important;' }
+      %th.info.text-right= '調整時間'
+      %td#adjustment_hour.text-right= adjustment_hour(@roster)

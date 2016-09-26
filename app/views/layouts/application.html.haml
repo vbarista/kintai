@@ -29,6 +29,7 @@
         .navbar-collapse.collapse.navbar-responsive-collapse
           %ul.nav.navbar-nav
             %li= link_to "勤務表", company_rosters_path(@current_company) if user_signed_in?
+            %li= link_to "社員一覧", users_path() if current_user.try(:admin?)
           %ul.nav.navbar-nav.navbar-right.root_links
             - if current_user.try(:admin?)
               %li= link_to content_tag('span', '管理', class: 'label label-danger'), rails_admin.dashboard_path

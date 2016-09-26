@@ -6,6 +6,7 @@
 #  type       :string
 #  name       :string           not null
 #  code       :string           not null
+#  delete_flg :boolean
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

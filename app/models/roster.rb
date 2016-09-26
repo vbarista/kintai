@@ -7,6 +7,7 @@
 #  user_id               :integer
 #  year                  :string
 #  month                 :string
+#  status                :string
 #  memo                  :string
 #  required_work_day     :string
 #  total_work_day        :string
@@ -38,7 +39,12 @@ class Roster < ActiveRecord::Base
 
   accepts_nested_attributes_for :one_days, allow_destroy: false
 
-  default_value_for :memo, '未編集'
+  STATUSES = {
+               unedited: '未編集',
+               edited: '編集済'   
+             }.with_indifferent_access
+
+  default_value_for :status, STATUSES[:unedited]
 
   def date
     @date ||= Date.new(year.to_i, month.to_i)

@@ -14,7 +14,7 @@
 class DayOfWorkAndHoliday < ActiveRecord::Base
   belongs_to :company
 
-  DAY_TYPES = { holyday: 0, work: 1 }
+  DAY_TYPES = { holiday: 0, work: 1 }
 
   default_value_for :day_type, 0 #休日
 end

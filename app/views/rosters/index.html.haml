@@ -1,3 +1,4 @@
+%h2= "【#{@user.name}】"
 
 %table.table.table-striped
   %thead
@@ -8,6 +9,9 @@
   %tbody
     - @rosters.each do |roster|
       %tr
-        %td= link_to roster.year + roster.month, edit_company_roster_path(@current_company, roster), class: 'btn btn-primary'
+        %td
+          = "#{roster.year + "/" + roster.month}:"
+          = link_to "編集", edit_company_user_roster_path(@current_company, @user, roster), class: 'btn btn-primary'
+          = link_to "確認", company_user_roster_path(@current_company, @user, roster), class: 'btn btn-success'
         %td= roster.memo
         %td=l roster.updated_at

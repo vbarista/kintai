@@ -1,7 +1,7 @@
 class UsersController < ApplicationAuthController
   before_action :check_admin!
-  before_action :set_users
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :users
+  before_action :user, only: [:show, :edit, :update, :destroy]
 
   def index
   end
@@ -40,11 +40,11 @@ class UsersController < ApplicationAuthController
   end
 
   private
-    def set_users
-      @users ||= current_company.users
+    def users
+      @users ||= User.all
     end
-    def set_user
-      @user = set_users.find(params[:id])
+    def user
+      @user = users.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.

@@ -11,12 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150608145711) do
+ActiveRecord::Schema.define(version: 20160915041527) do
 
   create_table "companies", force: :cascade do |t|
     t.string   "type"
     t.string   "name",       null: false
     t.string   "code",       null: false
+    t.boolean  "delete_flg"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -38,6 +39,16 @@ ActiveRecord::Schema.define(version: 20150608145711) do
   create_table "houses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "info_for_each_fiscal_years", force: :cascade do |t|
+    t.integer  "company_id"
+    t.integer  "user_id"
+    t.string   "year"
+    t.string   "carry_over_paid_leave_count"
+    t.string   "carry_over_late_ealy"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
   create_table "one_days", force: :cascade do |t|
@@ -62,6 +73,7 @@ ActiveRecord::Schema.define(version: 20150608145711) do
     t.integer  "user_id"
     t.string   "year"
     t.string   "month"
+    t.string   "status"
     t.string   "memo"
     t.string   "required_work_day"
     t.string   "total_work_day"
@@ -111,6 +123,10 @@ ActiveRecord::Schema.define(version: 20150608145711) do
     t.string   "rest_therd_e",  limit: 5
     t.string   "rest_fourth_s", limit: 5
     t.string   "rest_fourth_e", limit: 5
+    t.string   "rest_fifth_s",  limit: 5
+    t.string   "rest_fifth_e",  limit: 5
+    t.string   "rest_sixth_s",  limit: 5
+    t.string   "rest_sixth_e",  limit: 5
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
   end
@@ -119,15 +135,16 @@ ActiveRecord::Schema.define(version: 20150608145711) do
 
   create_table "users", force: :cascade do |t|
     t.boolean  "admin"
-    t.integer  "company_id",                          null: false
-    t.string   "name",                                null: false
+    t.integer  "company_id",                            null: false
+    t.string   "name",                                  null: false
     t.integer  "partner_id"
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
+    t.date     "grant_date_of_paid_leave"
+    t.string   "email",                    default: "", null: false
+    t.string   "encrypted_password",       default: "", null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,  null: false
+    t.integer  "sign_in_count",            default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"

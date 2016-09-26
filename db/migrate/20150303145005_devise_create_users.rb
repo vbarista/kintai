@@ -6,6 +6,7 @@ class DeviseCreateUsers < ActiveRecord::Migration
       t.integer :company_id, null: false, unique: true
       t.string  :name      , null: false, unique: true
       t.integer :partner_id
+      t.date    :grant_date_of_paid_leave # 初めて有休が付与された日付
 
       ## Database authenticatable
       t.string :email,              null: false, default: ""

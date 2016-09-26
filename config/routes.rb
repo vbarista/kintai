@@ -14,6 +14,9 @@ Rails.application.routes.draw do
 
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
+  resources :users, path: '/users' do
+  end
+
   resources :companies
   resources :companies, path: '/', param: :code do
     resources :users do
@@ -26,7 +29,7 @@ Rails.application.routes.draw do
     end
 
   end
-
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

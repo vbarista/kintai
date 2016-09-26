@@ -7,6 +7,7 @@
 #  user_id               :integer
 #  year                  :string
 #  month                 :string
+#  status                :string
 #  memo                  :string
 #  required_work_day     :string
 #  total_work_day        :string

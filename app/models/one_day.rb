@@ -42,7 +42,7 @@ class OneDay < ActiveRecord::Base
   HOLIDAY_SITUATION_VALUE_LIST = [:holiday, :holiday_work]
   LIQUIDATION_VALUE_LIST = [:bereavement, :special, :home, :drill]
 
-  DEFAULT_SITUATION = :holyday
+  DEFAULT_SITUATION = :holiday
   AT_WORK_SITUATION = :work
 
   default_value_for :situation, DEFAULT_SITUATION
@@ -75,7 +75,7 @@ class OneDay < ActiveRecord::Base
   end
 
   def day_of_holiday
-    @day_of_holiday ||= day_of.where(day_type: DayOfWorkAndHoliday::DAY_TYPES[:holyday])
+    @day_of_holiday ||= day_of.where(day_type: DayOfWorkAndHoliday::DAY_TYPES[:holiday])
   end
 
   def day_of_work
@@ -122,6 +122,8 @@ private
       set_break_time(list, from, to, t.rest_second_s, t.rest_second_e)
       set_break_time(list, from, to, t.rest_therd_s, t.rest_therd_e)
       set_break_time(list, from, to, t.rest_fourth_s, t.rest_fourth_e)
+      set_break_time(list, from, to, t.rest_fifth_s, t.rest_fifth_e)
+      set_break_time(list, from, to, t.rest_sixth_s, t.rest_sixth_e)
     end
   end
 

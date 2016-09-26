@@ -3,9 +3,10 @@ class CreateRosters < ActiveRecord::Migration
     create_table :rosters do |t|
       t.integer :company_id
       t.integer :user_id
-      t.string :year
-      t.string :month
-      t.string :memo
+      t.string  :year
+      t.string  :month
+      t.string  :status
+      t.string  :memo
 
       t.string :required_work_day
       t.string :total_work_day
