@@ -1,0 +1,41 @@
+勤務表管理プロジェクト
+
+# rbenvを使用するのに必要なライブラリをCentOSにインストール
+$ sudo yum install openssl-devel
+$ sudo yum install readline-devel
+$ sudo yum install git
+
+# rbenvのインストール
+$ git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+$ git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+# rbenvにPAHTを通す
+$ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+$ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+$ exec $SHELL -l
+
+$ rbenv install -l
+$ rbenv install 2.2.5
+$ rbenv rehash
+
+# グローバル設定(アプリケーション毎に設定したい場合は local)
+$ rbenv global 2.2.5
+
+# bundlerのインストール
+$ gem install bundler
+
+# SQLite 開発ツールのインストール
+$ sudo yum install sqlite-devel
+
+# アプリケーションで使用するgemをインストール
+$ cd kintai
+$ bundle install --path vendor/bundle
+
+# DB作成(SQLite)
+$ bundle exec rake db:migrate
+
+# 初期データの投入
+$ bundle exec rake db:seed
+
+# 起動
+$ bundle exec rails s -b {IPアドレス}
