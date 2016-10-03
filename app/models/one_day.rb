@@ -38,7 +38,7 @@ class OneDay < ActiveRecord::Base
               }.with_indifferent_access
 
   PAID_HOLIDAY_VALUE = :paid_holiday
-  NON_WORK_SITUASION_VALUE_LIST = [:holiday, :paid_holiday,  :transfer, :bereavement, :special, :house, :drill, :absence]
+  NON_WORK_SITUASION_VALUE_LIST = [:holiday, :paid_holiday,  :transfer, :bereavement, :special, :house, :drill, :absence, :home]
   HOLIDAY_SITUATION_VALUE_LIST = [:holiday, :holiday_work]
   LIQUIDATION_VALUE_LIST = [:bereavement, :special, :home, :drill]
 
@@ -93,6 +93,7 @@ private
   end
 
   def calc_late_early
+    return nil if self.situation == 'holiday_work'
     base = CalcWorkingHours::WorkingHours.new(time_setting.base).minute
 
     tikoku = 0

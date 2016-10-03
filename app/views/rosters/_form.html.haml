@@ -153,7 +153,6 @@
     getSituationCount("absence");       // 欠勤
     getSituationCount("transfer")       // 振替
     getSituationCount("business_trip"); // 出張
-    getSituationCount("holiday_work");  // 休出
 
     // 精算時間の計算
     var paid_hour = total_target_liquidation + total_all_paid_holiday; // 精算対象合計 + 有給休暇合計
@@ -188,7 +187,7 @@
       total_hour = base_hour * total;
       $("#total_hour_" + id).text(ZeroIsHyphen(total_hour));
       total_target_liquidation += total_hour;
-      $("#total_target_liquidation").text(total_target_liquidation);
+      $("#total_target_liquidation").text(total_target_liquidation + total_all_paid_holiday);
     // 有給
     } else if (id == #{ OneDay::PAID_HOLIDAY_VALUE.to_json }) {
       total_hour = base_hour * total;
@@ -228,8 +227,8 @@
               %td#day= od.object.day.day
               %td.situation= od.select :situation, situation_select_options(od.object), {}, { class: 'form-control ajax' }
               %td.company= od.select :company_id, Partner.all.map {|c| [c.name, c.id]}, { include_blank: true }, { class: 'form-control ajax company' }
-              %td= od.time_field :from, value: od.object.from, step: 900, class: 'form-control from ajax'
-              %td= od.time_field :to, value: od.object.to, step: 900, class: 'form-control to ajax'
+              %td= od.text_field :from, value: od.object.from, size: 30, pattern: '([0-9]|[0-9][0-9])(:[0-5][0-9])', class: 'form-control from ajax'
+              %td= od.text_field :to, value: od.object.to, size: 30, pattern: '([0-9]|[0-9][0-9])(:[0-5][0-9])', class: 'form-control to ajax'
               %td.form= od.text_field :working_hours, maxlength: 5, class: 'form-control working_hours', readonly: true
               %td.form= od.text_field :late_early, maxlength: 5, class: 'form-control late_early', readonly: true
               %td.form= od.number_field :house, maxlength: 5, step: 0.25, class: 'form-control house'

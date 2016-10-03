@@ -46,3 +46,8 @@ gem 'less-rails' # Railsでlessを使えるようにする。Bootstrapがlessで
 gem 'twitter-bootstrap-rails'
 
 gem 'activerecord-session_store'
+
+group :assets do
+  gem 'uglifier'
+end
+

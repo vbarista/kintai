@@ -13,8 +13,11 @@
     - @users.each do |user|
       %tr
         %td= user.company.name
-        %td= user.name
+        %td
+          = link_to '変更', edit_user_path(user), method: :get, class: 'btn btn-primary' if current_user.try(:admin?)
+          = user.name
         %td= user.partner.try(:name)
-        %td= link_to get_roster_status(user.rosters.try(:reverse).try(:second).try(:status)), company_user_rosters_path(user.company, user), method: :get
+        - btn_class = (get_roster_status(user.rosters.try(:reverse).try(:second).try(:status)) == '未編集') ? 'btn-warning' : 'btn-success'
+        %td= link_to get_roster_status(user.rosters.try(:reverse).try(:second).try(:status)), company_user_rosters_path(user.company, user), method: :get, class: "btn #{btn_class}"
         %td= user.rosters.try(:reverse).try(:second).try(:memo)
 

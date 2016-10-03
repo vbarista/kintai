@@ -16,6 +16,5 @@ class InfoForEachFiscalYear < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :user
-  has_many :one_days
 
 end

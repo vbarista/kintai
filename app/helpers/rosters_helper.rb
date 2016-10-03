@@ -26,8 +26,10 @@ module RostersHelper
 
   # 精算対象時間
   def total_target_liquidation_hour(r)
-    r.total_hour_working.to_f + r.total_hour_house.to_f +
-    (r.bereavement.to_f + r.home.to_f + r.special.to_f + r.drill.to_f) * Roster::BASE_WORK_HOUR
+    r.total_hour_working.to_f + 
+    r.total_hour_house.to_f +
+    r.total_hour_late_early.to_f +
+    (r.paid_holiday.to_f + r.bereavement.to_f + r.home.to_f + r.special.to_f + r.drill.to_f) * Roster::BASE_WORK_HOUR
   end
   
   # 精算基本時間
@@ -37,13 +39,13 @@ module RostersHelper
 
   # 精算時間
   def liquidation_hour(r)
-    lh = total_target_liquidation_hour(r) - total_base_liquidation_hour(r)
+    lh = r.total_hour_working.to_f - total_base_liquidation_hour(r)
     return lh > 0.0 ? lh : 0.0
   end
   
   # 調整時間
   def adjustment_hour(r)
-    ah = required_work_hour(r) - total_target_liquidation_hour(r)
+    ah = total_target_liquidation_hour(r) - required_work_hour(r)
     return ah < 0.0 ? ah : 0.0
   end
 

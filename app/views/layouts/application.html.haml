@@ -30,6 +30,8 @@
           %ul.nav.navbar-nav
             %li= link_to "勤務表", company_rosters_path(@current_company) if user_signed_in?
             %li= link_to "社員一覧", users_path() if current_user.try(:admin?)
+            %li= link_to "お知らせ", infos_path() if current_user.try(:admin?)
+            %li= link_to "出勤日・休日", '/admin/day_of_work_and_holiday' if current_user.try(:admin?)
           %ul.nav.navbar-nav.navbar-right.root_links
             - if current_user.try(:admin?)
               %li= link_to content_tag('span', '管理', class: 'label label-danger'), rails_admin.dashboard_path

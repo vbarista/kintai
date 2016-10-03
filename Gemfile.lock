@@ -291,6 +291,8 @@ GEM
       railties (~> 4.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    uglifier (3.0.2)
+      execjs (>= 0.3.0, < 3)
     warden (1.2.3)
       rack (>= 1.0)
     xpath (2.0.0)
@@ -337,3 +339,7 @@ DEPENDENCIES
   sqlite3
   therubyracer
   twitter-bootstrap-rails
+  uglifier
+
+BUNDLED WITH
+   1.13.0

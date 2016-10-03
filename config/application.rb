@@ -31,5 +31,9 @@ module Kintai
     config.generators do |g|
       g.template_engine :haml
     end
+
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}').to_s]
   end
 end
+
+

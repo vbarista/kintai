@@ -28,7 +28,7 @@ class UsersController < ApplicationAuthController
 
   def update
     if @user.update(user_params)
-      redirect_to [current_company, @user],  notice: 'User was successfully updated.'
+      redirect_to users_url,  notice: 'User was successfully updated.'
     else
       render :edit
     end
@@ -49,7 +49,7 @@ class UsersController < ApplicationAuthController
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit(:name, :email, :company_id, :encrypted_password)
+      params.require(:user).permit(:name, :email, :partner_id)
     end
 
 end

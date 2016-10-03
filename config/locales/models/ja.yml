@@ -1,0 +1,113 @@
+ja:
+  activerecord:
+    models:
+      house: このシステムの運用会社
+      company: 会社
+      partner: パートナー会社
+      user: ユーザー
+      one_day: 1日分の勤務表
+      time_setting: 業務時間設定
+      day_of_work_and_holiday: 出勤日、休日設定
+      info_for_each_fiscal_year: システム使用開始時の有給残と繰越遅刻早退時間の設定
+      info: お知らせ
+      roster: 勤務表
+    attributes:
+      company:
+        id: ID
+        type: 会社区分
+        name: 会社名
+        code: 会社コード(一意)
+        delete_flg: 削除フラグ
+        created_at: 登録日時
+        updated_at: 更新日時
+      time_setting:
+        id: ID
+        company: 会社名
+        base: 基本勤務時間
+        work_s: 始業時間
+        work_e: 終業時間
+        rest_first_s: 開始時刻-休憩(1)
+        rest_first_e: 終了時刻-休憩(1)
+        rest_second_s: 開始時刻-休憩(2)
+        rest_second_e: 終了時刻-休憩(2)
+        rest_therd_s: 開始時刻-休憩(3)
+        rest_therd_e: 終了時刻-休憩(3)
+        rest_fourth_s: 開始時刻-休憩(4)
+        rest_fourth_e: 終了時刻-休憩(4)
+        rest_fifth_s: 開始時刻-休憩(5)
+        rest_fifth_e: 終了時刻-休憩(5)
+        rest_sixth_s: 開始時刻-休憩(6)
+        rest_sixth_e: 終了時刻-休憩(6)
+        created_at: 登録日時
+        updated_at: 更新日時
+      roster:
+        id: ID
+        company: 所属
+        user: ユーザー名
+        year: 年
+        month: 月
+        status: 編集状態
+        memo: メモ
+        required_work_day: 要出勤日数
+        total_work_day: 出勤数
+        required_work_hour: 要出勤時間
+        allowance_hour: 業務手当時間
+        absence: 欠勤数
+        holiday_work: 休日出勤
+        home: 自宅待機
+        paid_holiday: 有給休暇
+        house_work: 社内勤務
+        bereavement: 忌引
+        transfer: 振替休日
+        business_trip: 出張
+        drill: 教練
+        special: 特別休暇
+        total_hour_working: 出勤時間(トータル)
+        total_hour_house: 社内勤務(トータル)
+        total_hour_late_early: 遅刻早退(トータル)
+        one_days: 日別情報
+        created_at: 登録日時
+        updated_at: 更新日時
+      one_day:
+        roster: 勤務表
+        company: 業務時間設定
+        situation: 休日(holiday)、出勤(work)
+        day: 日付
+        from: 開始時刻
+        to: 終了時刻
+        wirking_hours: 稼働時間
+        late_early: 遅刻早退時間
+        house: 所属(未使用)
+        note: メモ
+        created_at: 登録日時
+        updated_at: 更新日時
+      info:
+        title: タイトル
+        content: 内容
+        created_at: 登録日時
+        updated_at: 更新日時
+      user:
+        id: ID
+        admin: 管理権限
+        company: 所属
+        name: 名前
+        partner: 派遣先
+        grant_date_of_paid_leave: 初めての有給付与日
+        created_at: 登録日時
+        updated_at: 更新日時
+      info_for_each_fiscal_year:
+        id: ID
+        company: 所属会社
+        user: ユーザー名
+        year: システム使用開始年度
+        carry_over_paid_leave_count: 繰越有給残
+        carry_over_late_ealy: 繰越遅刻早退時間
+        created_at: 登録日時
+        updated_at: 更新日時
+      day_of_work_and_holiday:
+        id: ID
+        company: 会社名
+        day_type: 0:祭日、1:出勤日
+        day: 日付
+        created_at: 登録日時
+        updated_at: 更新日時

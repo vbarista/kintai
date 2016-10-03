@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Title:
+  = @info.title
+%p
+  %b Content:
+  = @info.content
+
+= link_to 'Edit', edit_info_path(@info)
+\|
+= link_to 'Back', infos_path

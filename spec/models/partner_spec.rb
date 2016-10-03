@@ -13,6 +13,6 @@
 
 require 'rails_helper'
 
-RSpec.describe CompanyPartner, type: :model do
+RSpec.describe Partner, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end
