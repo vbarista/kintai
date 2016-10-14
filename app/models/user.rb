@@ -33,4 +33,24 @@ class User < ActiveRecord::Base
   belongs_to :partner
   has_many :rosters, dependent: :destroy
   has_many :info_for_each_fiscal_years, dependent: :destroy
+
+  # see https://github.com/sferik/rails_admin/issues/2265
+  rails_admin do
+    configure :password_reset
+
+    edit do
+      exclude_fields :password, :password_confirmation
+      include_fields :password_reset
+    end
+  end
+
+  # Provided for Rails Admin to allow the password to be reset
+  def password_reset; nil; end
+
+  def password_reset=(value)
+    return nil if value.blank?
+    self.password = value
+    self.password_confirmation = value
+  end
+
 end

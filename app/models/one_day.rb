@@ -89,7 +89,10 @@ private
   end
 
   def calc_working_hours
-    time_cord_row.working_hours.minute/60.0
+    minite = time_cord_row.working_hours.minute
+    # 15分でまるめている
+    minite = minite - minite%15
+    minite/60.0
   end
 
   def calc_late_early
@@ -101,6 +104,9 @@ private
       tikoku_row_data = row_data(from, time_setting.work_e)
       tikoku = CalcWorkingHours::TimeCardRow.new(*tikoku_row_data).working_hours.minute
       tikoku = base - tikoku
+      # 15分でまるめている
+      tikoku = tikoku + 15 if tikoku%15 > 0
+      tikoku = tikoku - tikoku%15
     end
 
     soutai = 0
@@ -108,6 +114,9 @@ private
       soutai_row_data = row_data(time_setting.work_s, to)
       soutai = CalcWorkingHours::TimeCardRow.new(*soutai_row_data).working_hours.minute
       soutai = base - soutai
+      # 15分でまるめている
+      soutai = soutai + 15 if soutai%15 > 0
+      soutai = soutai - soutai%15
     end
 
     late_early = tikoku + soutai
