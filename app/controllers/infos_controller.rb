@@ -4,7 +4,7 @@ class InfosController < ApplicationAuthController
 
   # GET /infos
   def index
-    @infos = Info.all
+    @infos = Info.all.reverse
   end
 
   # GET /infos/1

@@ -162,7 +162,7 @@
       %td{ rowspan: 4 }
       %td{ style: 'border-top-style: hidden !important; border-bottom-style: hidden !important;' }
       %th.info.text-right= '精算基本時間'
-      %td#total_base_liquidation_hour.text-right= @roster.allowance_hour.to_f + @roster.required_work_day.to_f * Roster::BASE_WORK_HOUR
+      %td#total_base_liquidation_hour.text-right= total_base_liquidation_hour(@roster)
     %tr
       %td{ colspan: 3, style: 'border-right-style: hidden !important;' }
     %tr

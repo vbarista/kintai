@@ -1,6 +1,7 @@
 class RostersController < ApplicationAuthController
   before_action :user
   before_action :rosters
+  before_action :check_self_roster!, only: [:index]
   before_action :roster, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -82,6 +83,17 @@ class RostersController < ApplicationAuthController
   end
 
 private
+
+  def check_self_roster!
+    return unless params[:user_id]
+    case
+    when current_user.reader?
+      raise CanCan::AccessDenied unless current_company.users.where(partner: current_user.partner).where.not(partner: nil).find_by(id: params[:user_id])
+    else
+      return if current_user.admin?
+      raise CanCan::AccessDenied if current_user.id.to_s != params[:user_id]
+    end
+  end
 
   def user
     if params[:user_id]

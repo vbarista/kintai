@@ -57,11 +57,10 @@ class OneDay < ActiveRecord::Base
   end
 
   def set_working_hours_and_late_early
+    self.working_hours = self.late_early = nil
     if time_format?
       self.working_hours = calc_working_hours
-      self.late_early = calc_late_early
-    else
-      self.working_hours = self.late_early = nil
+      self.late_early = calc_late_early if self.situation == "late_early"
     end
   end
 
@@ -141,12 +140,29 @@ private
     @time_setting ||= company.try(:time_setting)
   end
 
-  def set_break_time(list, from, to, s, e)
-    if s && e
-      s = [from.rjust(5, "0"), s.rjust(5, "0")].max
-      e = [to.rjust(5, "0"), e.rjust(5, "0")].min
-      list << [s, e] if s.to_time < e.to_time
+  def set_break_time(list, work_start_time, work_end_time, rest_start_time, rest_end_time)
+    return unless rest_start_time.present? && rest_end_time.present?
+
+    if is_over_day?(work_end_time) && (work_start_time.rjust(5, "0") > rest_end_time.rjust(5, "0"))
+      s = [work_start_time.rjust(5, "0"), adjust_end_time(rest_start_time)].max
+      e = [work_end_time.rjust(5, "0"), adjust_end_time(rest_end_time)].min
+    else
+      s = [work_start_time.rjust(5, "0"), rest_start_time.rjust(5, "0")].max
+      e = [work_end_time.rjust(5, "0"), rest_end_time.rjust(5, "0")].min
     end
+
+    list << [s, e] if s < e
+  end
+
+  # 勤務終了時間が24時を越える深夜の場合の調整
+  def adjust_end_time(rest_end_time)
+    hour, minute = rest_end_time.split(":").map(&:to_i)
+    hour += 24
+    return "#{hour.to_s.rjust(2, "0")}:#{minute.to_s.rjust(2, "0")}"
+  end
+
+  def is_over_day?(work_end_time)
+    return (work_end_time.rjust(5, "0") > "24:00")
   end
 
   def self.change_to_minute(str)

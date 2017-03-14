@@ -17,7 +17,6 @@
     /[if lt IE 9]
       = javascript_include_tag "//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"
 
-
   %body
     .navbar.navbar-default.navbar-static-top
       .container
@@ -29,11 +28,11 @@
         .navbar-collapse.collapse.navbar-responsive-collapse
           %ul.nav.navbar-nav
             %li= link_to "勤務表", company_rosters_path(@current_company) if user_signed_in?
-            %li= link_to "社員一覧", users_path() if current_user.try(:admin?)
-            %li= link_to "お知らせ", infos_path() if current_user.try(:admin?)
-            %li= link_to "出勤日・休日", '/admin/day_of_work_and_holiday' if current_user.try(:admin?)
+            %li= link_to "社員一覧", users_path() if reader_user?
+            %li= link_to "お知らせ", infos_path() if reader_user?
+            %li= link_to "出勤日・休日", '/admin/day_of_work_and_holiday' if admin_user?
           %ul.nav.navbar-nav.navbar-right.root_links
-            - if current_user.try(:admin?)
+            - if admin_user?
               %li= link_to content_tag('span', '管理', class: 'label label-danger'), rails_admin.dashboard_path
             - if current_user
               %li= link_to content_tag('span', 'ログアウト', class: 'label label-danger'), destroy_user_session_path, method: :delete
@@ -43,4 +42,3 @@
       .row
         = bootstrap_flash
         = yield
-

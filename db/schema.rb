@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160928060154) do
+ActiveRecord::Schema.define(version: 20170309042720) do
 
   create_table "companies", force: :cascade do |t|
     t.string   "type"
@@ -101,6 +101,7 @@ ActiveRecord::Schema.define(version: 20160928060154) do
     t.string   "total_hour_late_early"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
+    t.string   "data"
   end
 
   add_index "rosters", ["company_id", "user_id"], name: "index_rosters_on_company_id_and_user_id"
@@ -158,6 +159,10 @@ ActiveRecord::Schema.define(version: 20160928060154) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "contact"
+    t.string   "emergency_contact"
+    t.date     "birthday"
+    t.boolean  "reader"
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id"

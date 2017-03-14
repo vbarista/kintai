@@ -9,7 +9,13 @@
   .field
     = f.label :name
     = f.text_field :name, class: 'form-control'
+    = f.label :birthday
+    = f.date_field :birthday, class: 'form-control'
+    = f.label :contact
+    = f.text_field :contact, class: 'form-control'
+    = f.label :emergency_contact
+    = f.text_field :emergency_contact, class: 'form-control'
     = f.label :partner
     = f.select :partner_id, Partner.all.map {|c| [c.name, c.id]}, { include_blank: true }, { class: 'form-control' }
-    = f.label :save
+    == <br />
     = f.submit  '保存', class: 'btn btn-success form-control'

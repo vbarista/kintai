@@ -1,17 +1,34 @@
-%h2= "【#{@user.name}】"
+- if reader_user?
+  %ul.nav.nav-pills.nav-justified
+    - users = @current_company.users
+    - users = users.where(partner: current_user.partner).where.not(partner: nil) unless admin_user?
+    - users.each_with_index do |user, index|
+      - li_class = user.id == @user.id ? 'active' : ''
+      %li{class: li_class}= link_to user.name, company_user_rosters_path(@current_company, user)
+- else
+  %h2= "【#{@user.name}】"
 
 %table.table.table-striped
   %thead
     %tr
       %th= '年月'
+      %th= '精算基本時間'
+      %th= '精算対象時間 (有給＋遅早)'
+      %th= '有給残'
+      %th= '調整時間'
       %th= 'メモ'
       %th= '最終更新'
+
   %tbody
     - @rosters.each do |roster|
       %tr
-        %td
+        %td.text-nowrap
           = "#{roster.year + "/" + roster.month}:"
           = link_to "編集", edit_company_user_roster_path(@current_company, @user, roster), class: 'btn btn-primary'
-          = link_to "確認", company_user_roster_path(@current_company, @user, roster), class: 'btn btn-success'
+          = link_to "確認", company_user_roster_path(@current_company, @user, roster), class: 'btn btn-success' if roster.try(:status) == 'edited'
+        %td= total_base_liquidation_hour(roster)
+        %td= "#{total_target_liquidation_hour(roster)} (#{roster.total_hour_late_early.to_f + roster.paid_holiday.to_f * Roster::BASE_WORK_HOUR})"
+        %td= rest_paid_leave(roster)
+        %td= adjustment_hour(roster)
         %td= roster.memo
         %td=l roster.updated_at

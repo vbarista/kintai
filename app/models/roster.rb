@@ -44,7 +44,7 @@ class Roster < ActiveRecord::Base
                edited: '編集済'   
              }.with_indifferent_access
 
-  default_value_for :status, STATUSES[:unedited]
+  default_value_for :status, 'unedited'
 
   def date
     @date ||= Date.new(year.to_i, month.to_i)

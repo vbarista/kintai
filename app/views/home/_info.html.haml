@@ -1,7 +1,7 @@
 
 %h1.text-primary お知らせ
 
-- Info.all().each do |info|
+- Info.all().reverse.each do |info|
   %hr
   %ui.list-group
     %li.list-group-item= "#{info.title}：#{info.content}"

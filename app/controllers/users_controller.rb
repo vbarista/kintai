@@ -1,5 +1,5 @@
 class UsersController < ApplicationAuthController
-  before_action :check_admin!
+  before_action :check_reader!
   before_action :users
   before_action :user, only: [:show, :edit, :update, :destroy]
 
@@ -40,16 +40,22 @@ class UsersController < ApplicationAuthController
   end
 
   private
-    def users
+
+  def users
+    if current_user.reader?
+      @users ||= User.where(partner: current_user.partner).where.not(partner_id: nil)
+    else
       @users ||= User.all
     end
-    def user
-      @user = users.find(params[:id])
-    end
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params
-      params.require(:user).permit(:name, :email, :partner_id)
-    end
+  def user
+    @user = users.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def user_params
+    params.require(:user).permit(:name, :birthday, :email, :contact, :emergency_contact, :partner_id)
+  end
 
 end

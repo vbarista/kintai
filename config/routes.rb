@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   resources :users, path: '/users' do
   end
 
-  resources :companies
+  resources :companies, param: :code
   resources :companies, path: '/', param: :code do
     resources :users do
       resources :rosters

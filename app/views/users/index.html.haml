@@ -5,6 +5,9 @@
     %tr
       %th 所属
       %th 氏名
+      - if reader_user?
+        %th 連絡先
+        %th 緊急連絡先
       %th 派遣先
       %th 先月勤務表の状態
       %th メモ
@@ -12,12 +15,15 @@
   %tbody
     - @users.each do |user|
       %tr
-        %td= user.company.name
-        %td
-          = link_to '変更', edit_user_path(user), method: :get, class: 'btn btn-primary' if current_user.try(:admin?)
-          = user.name
+        %td.text-nowrap= user.company.name
+        %td.text-nowrap
+          = link_to user.name, edit_user_path(user), method: :get if reader_user?
+        - if reader_user?
+          %td= user.try(:contact)
+          %td= user.try(:emergency_contact)
         %td= user.partner.try(:name)
-        - btn_class = (get_roster_status(user.rosters.try(:reverse).try(:second).try(:status)) == '未編集') ? 'btn-warning' : 'btn-success'
-        %td= link_to get_roster_status(user.rosters.try(:reverse).try(:second).try(:status)), company_user_rosters_path(user.company, user), method: :get, class: "btn #{btn_class}"
+        - button_name = get_roster_status(user.rosters.try(:reverse).try(:second).try(:status))
+        - btn_class = (button_name == '編集済')? 'btn-success' : 'btn-warning'
+        %td= link_to button_name, company_user_rosters_path(user.company, user), method: :get, class: "btn #{btn_class}"
         %td= user.rosters.try(:reverse).try(:second).try(:memo)
 

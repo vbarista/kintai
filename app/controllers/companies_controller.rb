@@ -42,7 +42,7 @@ class CompaniesController < ApplicationAuthController
 
   private
     def set_company
-      @company = Company.find_by(code: params[:id])
+      @company = Company.find_by(code: params[:code])
     end
 
     def company_params
